@@ -8,16 +8,29 @@ const supabaseUrl = "https://your-project.supabase.co";
 const supabaseKey = "your-anon-key";
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+// Define the Question Type for TypeScript
+type QuestionType = {
+  id: number;
+  category: string;
+  question_text: string;
+  option_a: string;
+  option_b: string;
+  option_c: string;
+  option_d: string;
+  correct_answer: string;
+  explanation: string;
+};
+
 // Fallback questions (used if Supabase isn't configured yet)
-const fallbackQuestions = [
+const fallbackQuestions: QuestionType[] = [
   { id: 1, category: "Misrepresentation", question_text: "How should you accurately describe the QNET business?", option_a: "A salaried job", option_b: "An independent direct selling opportunity", option_c: "A passive investment", option_d: "A franchise", correct_answer: "B", explanation: "It is an independent direct selling opportunity." },
   { id: 2, category: "Misappropriation", question_text: "Can you substitute a product chosen by a downline with another of equal value?", option_a: "Yes, if same value", option_b: "No, must purchase exactly what was requested", option_c: "Yes, if better for them", option_d: "Yes, if informed after", correct_answer: "B", explanation: "Substituting products without explicit prior approval is a violation." },
   { id: 3, category: "Minors", question_text: "Can a minor hold a TC in trust until they turn 18?", option_a: "Yes, if upline manages", option_b: "No, cannot be held by a minor", option_c: "Yes, but no commissions", option_d: "Yes, with birth cert", correct_answer: "B", explanation: "Registering minors is strictly prohibited." }
 ];
 
 export default function Home() {
-  const [questions, setQuestions] = useState(fallbackQuestions);
-  const [selectedQuestions, setSelectedQuestions] = useState([]);
+  const [questions, setQuestions] = useState<QuestionType[]>(fallbackQuestions);
+  const [selectedQuestions, setSelectedQuestions] = useState<number[]>([]);
   const [formData, setFormData] = useState({
     name: "",
     id: "",
@@ -31,19 +44,19 @@ export default function Home() {
   // Fetch questions from Supabase on load (if configured)
   useEffect(() => {
     if (supabaseUrl !== "https://your-project.supabase.co") {
-      async function fetchQuestions() {
+      const fetchQuestions = async () => {
         const { data, error } = await supabase.from("refresher_questions").select("*");
-        if (data && data.length > 0) setQuestions(data);
-      }
+        if (data && data.length > 0) setQuestions(data as QuestionType[]);
+      };
       fetchQuestions();
     }
   }, []);
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleQuestionSelect = (qId) => {
+  const handleQuestionSelect = (qId: number) => {
     if (selectedQuestions.includes(qId)) {
       setSelectedQuestions(selectedQuestions.filter((id) => id !== qId));
     } else if (selectedQuestions.length < 10) {
@@ -76,7 +89,7 @@ export default function Home() {
     });
 
     // 2. Build Correct Answers Object for JS
-    let correctAnswersObj = {};
+    let correctAnswersObj: Record<string, string> = {};
     selectedQs.forEach((q, index) => {
       correctAnswersObj[`q${index + 1}`] = q.correct_answer;
     });
@@ -84,7 +97,8 @@ export default function Home() {
     // 3. Build Correct Answers Display for Fail Screen
     let answersDisplay = "<ol>";
     selectedQs.forEach((q, index) => {
-      answersDisplay += `<li><strong>${q.correct_answer}) ${q["option_" + q.correct_answer.toLowerCase()]}</strong> — ${q.explanation}</li>`;
+      const correctOption = `option_${q.correct_answer.toLowerCase()}` as keyof QuestionType;
+      answersDisplay += `<li><strong>${q.correct_answer}) ${q[correctOption]}</strong> — ${q.explanation}</li>`;
     });
     answersDisplay += "</ol>";
 
