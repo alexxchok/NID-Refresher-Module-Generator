@@ -319,7 +319,8 @@ export default function Home() {
     link.click();
 
     // Draft Email to Distributor
-    const emailSubject = "Mandatory Compliance Training Assignment - " + localize("QNET") + " P&P Refresher";
+    const businessUnitName = region === "Vihaan" ? "Vihaan" : "Qnet";
+    const emailSubject = `Mandatory ${businessUnitName} P&P Refresher (${formData.id})`;
     const emailBody = `Dear ${formData.name} (${formData.id}),\n\nYou have been assigned a mandatory training module by the Network Integrity Department in response to a complaint filed against you.\n\nPlease find the attached training module file (${formData.id}_training.html). Download and open it in your web browser to complete the compliance quiz.\n\nYou must score 100% to pass. Upon passing, follow the instructions on the screen to generate and send the completion email to Network Integrity.\n\nNote: Replying directly to this email will not be accepted as completion. You must use the button inside the module to send an email containing a Unique Completion Token.\n\nRegards,\nNetwork Integrity Department`;
     
     // Hardcode CC to network.integrity@qnet.net
