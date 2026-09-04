@@ -32,7 +32,7 @@ const allQuestions: QuestionType[] = [
   { id: 12, category: "Misappropriation", question_text: "If a downline requests a refund for a product purchase and the company issues the refund to your account, what must you do?", option_a: "Keep the money as a service fee for handling their account.", option_b: "Use the money to purchase other products for your downline.", option_c: "Immediately return the refunded amount to the downline.", option_d: "Hold the money until the downline reaches a certain rank.", correct_answer: "C", explanation: "Immediately return the refunded amount to the downline." },
   { id: 13, category: "Misappropriation", question_text: "Can you collect 'deposits' or 'advances' from prospects for future, unspecified product purchases?", option_a: "No, collecting advances or deposits is a violation of QNET Red Lines.", option_b: "Yes, if you issue a personal receipt.", option_c: "Yes, as long as the amount is under $100.", option_d: "No, unless the prospect is a close relative.", correct_answer: "A", explanation: "No, collecting advances or deposits is a violation of QNET Red Lines." },
   { id: 14, category: "Misappropriation", question_text: "Upon completing a product purchase for a downline, what is your obligation to them?", option_a: "Keep the products until they have completed their training.", option_b: "Provide them with the purchase receipts and inform them on how to collect the product.", option_c: "Open the products and use them together.", option_d: "Register the products under your own name for safety.", correct_answer: "B", explanation: "Provide them with the purchase receipts and inform them on how to collect the product." },
-  { id: 15, category: "Misappropriation", question_text: "If a downline gives you their Virtual Office login details to place an order, can you use their Q Account funds for your own purposes?", option_a: "Yes, if they gave you their password.", option_b: "No, stealing or misusing money/funds from a downline’s Virtual Office is strictly prohibited.", option_c: "Yes, as long as you leave a small balance.", option_d: "No, unless you have a verbal agreement.", correct_answer: "B", explanation: "No, stealing or misusing money/funds from a downline’s Virtual Office is strictly prohibited." },
+  { id: 15, category: "Misappropriation", question_text: "If a downline gives you their Virtual Office login details to place an order, can you use their Q Account funds for your own purposes?", option_a: "Yes, if they gave you their password.", option_b: "No, stealing or misusing money/funds from a downline’s Q Account is strictly prohibited.", option_c: "Yes, as long as you leave a small balance.", option_d: "No, unless you have a verbal agreement.", correct_answer: "B", explanation: "No, stealing or misusing money/funds from a downline’s Q Account is strictly prohibited." },
   { id: 16, category: "Misappropriation", question_text: "What happens if you take money from a prospect under false pretenses (e.g., promising a job or investment)?", option_a: "It is acceptable if you eventually sign them up as a distributor.", option_b: "It is considered cheating/swindling and is a severe violation.", option_c: "It is a minor offense and only requires a warning.", option_d: "It is allowed if the prospect is not a resident of your country.", correct_answer: "B", explanation: "It is considered cheating/swindling and is a severe violation." },
   { id: 17, category: "Misappropriation", question_text: "Can you purchase products for an ID without their explicit prior approval?", option_a: "Yes, if you are their direct upline.", option_b: "Yes, if it helps them maintain their rank.", option_c: "No, purchasing products for an ID without their explicit prior approval is a Qnet Red Lines violation.", option_d: "Yes, if you use your own money.", correct_answer: "C", explanation: "No, purchasing products for an ID without their explicit prior approval is a Qnet Red Lines violation." },
   
@@ -57,13 +57,11 @@ const allQuestions: QuestionType[] = [
 export default function Home() {
   const [questions] = useState<QuestionType[]>(allQuestions);
   const [selectedQuestions, setSelectedQuestions] = useState<number[]>([]);
+  const [region, setRegion] = useState<"Global" | "Vihaan">("Global");
   const [formData, setFormData] = useState({
     name: "",
     id: "",
-    caseSummary: "",
-    section1Title: "Section 1: Product Authorization & Explicit Prior Approval",
-    section1Text: "When a prospect or downline provides funds for a specific QNET product, you are acting in a position of trust. You must purchase exactly the product they have chosen and requested.",
-    redLines1: "Do NOT purchase products for an IR without explicit prior approval.\nDo NOT place an order or make unauthorized product collection on behalf of an IR."
+    recipientEmail: ""
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -80,6 +78,15 @@ export default function Home() {
     }
   };
 
+  // Helper function to replace terms for Vihaan live in the UI and the HTML
+  const localize = (text: string) => {
+    if (region !== "Vihaan") return text;
+    return text
+      .replace(/QNET/g, "Vihaan")
+      .replace(/Qnet/g, "Vihaan")
+      .replace(/Q Account/g, "CPA");
+  };
+
   const generateHTML = () => {
     if (selectedQuestions.length !== 10) {
       alert("Please select exactly 10 questions.");
@@ -93,11 +100,11 @@ export default function Home() {
     selectedQs.forEach((q, index) => {
       quizHTML += `
         <div class="question">
-          <p>${index + 1}. ${q.question_text}</p>
-          <label><input type="radio" name="q${index + 1}" value="A"> A) ${q.option_a}</label>
-          <label><input type="radio" name="q${index + 1}" value="B"> B) ${q.option_b}</label>
-          <label><input type="radio" name="q${index + 1}" value="C"> C) ${q.option_c}</label>
-          <label><input type="radio" name="q${index + 1}" value="D"> D) ${q.option_d}</label>
+          <p>${index + 1}. ${localize(q.question_text)}</p>
+          <label><input type="radio" name="q${index + 1}" value="A"> A) ${localize(q.option_a)}</label>
+          <label><input type="radio" name="q${index + 1}" value="B"> B) ${localize(q.option_b)}</label>
+          <label><input type="radio" name="q${index + 1}" value="C"> C) ${localize(q.option_c)}</label>
+          <label><input type="radio" name="q${index + 1}" value="D"> D) ${localize(q.option_d)}</label>
         </div>
       `;
     });
@@ -112,20 +119,17 @@ export default function Home() {
     let answersDisplay = "<ol>";
     selectedQs.forEach((q, index) => {
       const correctOption = `option_${q.correct_answer.toLowerCase()}` as keyof QuestionType;
-      answersDisplay += `<li><strong>${q.correct_answer}) ${q[correctOption]}</strong> — ${q.explanation}</li>`;
+      answersDisplay += `<li><strong>${q.correct_answer}) ${localize(q[correctOption])}</strong> — ${localize(q.explanation)}</li>`;
     });
     answersDisplay += "</ol>";
 
-    // 4. Build Red Lines List
-    let redLinesList = formData.redLines1.split("\n").filter(l => l.trim() !== "").map(line => `<li>${line}</li>`).join("");
-
-    // 5. Construct Full HTML Template
+    // 4. Construct Full HTML Template
     const htmlTemplate = `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Qnet Policies & Procedures (P&P) Refresher Module</title>
+<title>${localize("Qnet")} Policies & Procedures (P&P) Refresher Module</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #2c3e50; background: #f4f6f9; padding: 20px; }
@@ -136,18 +140,9 @@ export default function Home() {
   .content { padding: 40px; }
   .intro { background: #eef3fb; border-left: 5px solid #1a3a6c; padding: 20px; border-radius: 6px; margin-bottom: 25px; }
   .intro p { margin-bottom: 12px; }
-  .resource-note { font-style: italic; color: #555; background: #fafafa; padding: 12px 16px; border: 1px dashed #ccc; border-radius: 6px; margin-bottom: 30px; font-size: 0.92em; }
   h2.section-title { color: #1a3a6c; border-bottom: 2px solid #e0e6ed; padding-bottom: 10px; margin: 30px 0 15px; font-size: 1.4em; }
   .section { margin-bottom: 35px; }
   .section p { margin-bottom: 12px; }
-  .red-lines-btn { background: #c0392b; color: #fff; border: none; padding: 12px 22px; border-radius: 6px; cursor: pointer; font-size: 0.98em; font-weight: 600; margin: 12px 0; }
-  .red-lines-btn:hover { background: #962d22; }
-  .red-lines-content { display: none; background: #fdecea; border: 1px solid #f5c6cb; border-left: 5px solid #c0392b; padding: 18px 22px; border-radius: 6px; margin-top: 10px; }
-  .red-lines-content h4 { color: #c0392b; margin-bottom: 10px; font-size: 1.05em; }
-  .red-lines-content ul { list-style: none; padding-left: 0; }
-  .red-lines-content ul li { padding: 6px 0 6px 28px; position: relative; border-bottom: 1px solid #f8d7da; font-size: 0.95em; }
-  .red-lines-content ul li:last-child { border-bottom: none; }
-  .red-lines-content ul li::before { content: "✗"; position: absolute; left: 4px; color: #c0392b; font-weight: bold; font-size: 1.1em; }
   .quiz-section { background: #fafbfc; padding: 25px; border-radius: 8px; border: 1px solid #e0e6ed; margin-top: 30px; }
   .quiz-section h2 { color: #1a3a6c; margin-bottom: 8px; }
   .quiz-instructions { font-size: 0.9em; color: #7f8c8d; margin-bottom: 20px; }
@@ -185,23 +180,13 @@ export default function Home() {
 <body>
 <div class="container">
   <header>
-    <h1>Qnet Policies &amp; Procedures (P&amp;P) Refresher Module</h1>
+    <h1>${localize("Qnet")} Policies &amp; Procedures (P&amp;P) Refresher Module</h1>
     <div class="subtitle">Network Integrity Department</div>
   </header>
   <div class="content">
     <div class="intro">
       <p>Dear <strong>${formData.name}</strong> (<strong>${formData.id}</strong>),</p>
-      <p>Welcome. You have been assigned this mandatory training module by the Network Integrity Department in response to a complaint filed against you. ${formData.caseSummary}</p>
-    </div>
-    <div class="resource-note">Note: Please refer to the attached QNET Policies &amp; Procedures (P&amp;P) &amp; Qnet Code Of Ethics document for full details.</div>
-    <div class="section">
-      <h2 class="section-title">${formData.section1Title}</h2>
-      <p>${formData.section1Text}</p>
-      <button class="red-lines-btn" data-target="rl1">⚠ Click to see the Red Lines</button>
-      <div class="red-lines-content" id="rl1">
-        <h4>Red Lines — What NOT to Do:</h4>
-        <ul>${redLinesList}</ul>
-      </div>
+      <p>Welcome. You have been assigned this mandatory training module by the Network Integrity Department in response to a complaint filed against you. Please complete the compliance quiz below to confirm your understanding of ${localize("QNET")}'s Policies &amp; Procedures.</p>
     </div>
     <div class="quiz-section">
       <h2>Compliance Quiz</h2>
@@ -229,7 +214,7 @@ export default function Home() {
             <p><strong>Step 1: Generate &amp; Send the Completion Email</strong></p>
             <div class="confirmation-row">
               <input type="checkbox" id="confirmCheck">
-              <label for="confirmCheck">I confirm that I have read, understood, and will comply with the QNET P&amp;P and Code of Ethics at all times.</label>
+              <label for="confirmCheck">I confirm that I have read, understood, and will comply with the ${localize("QNET")} P&amp;P and Code of Ethics at all times.</label>
             </div>
             <div class="email-form">
               <label>Distributor Name:</label>
@@ -250,7 +235,7 @@ export default function Home() {
       </div>
     </div>
   </div>
-  <footer>© QNET Network Integrity Department | Confidential — For Distributor Training Purposes Only</footer>
+  <footer>© ${localize("QNET")} Network Integrity Department | Confidential — For Distributor Training Purposes Only</footer>
 </div>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
@@ -299,8 +284,8 @@ export default function Home() {
         tokenBox.style.display = 'block';
         var name = document.getElementById('distName').value;
         var id = document.getElementById('distID').value;
-        var subject = "[COMPLETION LOG - TOKEN: " + token + "] " + id + " QNET P&P Refresher";
-        var body = "Dear Network Integrity Team,\\n\\nI, " + name + " (Distributor ID: " + id + "), hereby confirm that I have successfully completed the Qnet P&P & Red Lines Refresher.\\n\\nRegards,\\n" + name + "\\nDistributor ID: " + id;
+        var subject = "${localize("QNET")} P&P Refresher (" + id + ") [COMPLETION LOG - TOKEN: " + token + "]";
+        var body = "Dear Network Integrity Team,\\n\\nI, " + name + " (Distributor ID: " + id + "), hereby confirm that I have successfully completed the ${localize("Qnet")} P&P & Red Lines Refresher.\\n\\nRegards,\\n" + name + "\\nDistributor ID: " + id;
         var mailtoLink = "mailto:network.integrity@qnet.net?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
         emailBtn.href = mailtoLink;
         emailBtn.classList.add('active');
@@ -332,6 +317,18 @@ export default function Home() {
     link.href = URL.createObjectURL(blob);
     link.download = `${formData.id}_training.html`;
     link.click();
+
+    // Draft Email to Distributor
+    const emailSubject = "Mandatory Compliance Training Assignment - " + localize("QNET") + " P&P Refresher";
+    const emailBody = `Dear ${formData.name} (${formData.id}),\n\nYou have been assigned a mandatory training module by the Network Integrity Department in response to a complaint filed against you.\n\nPlease find the attached training module file (${formData.id}_training.html). Download and open it in your web browser to complete the compliance quiz.\n\nYou must score 100% to pass. Upon passing, follow the instructions on the screen to generate and send the completion email to Network Integrity.\n\nNote: Replying directly to this email will not be accepted as completion. You must use the button inside the module to send an email containing a Unique Completion Token.\n\nRegards,\nNetwork Integrity Department`;
+    
+    // Hardcode CC to network.integrity@qnet.net
+    const mailtoLink = `mailto:${formData.recipientEmail}?cc=network.integrity@qnet.net&subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+    
+    // Slight delay to ensure file download starts before opening email client
+    setTimeout(() => {
+      window.location.href = mailtoLink;
+    }, 500);
   };
 
   return (
@@ -339,15 +336,26 @@ export default function Home() {
       <h1 style={{ color: "#1a3a6c" }}>QNET Refresher Module Generator</h1>
       
       <div style={{ background: "#fff", padding: "20px", borderRadius: "8px", boxShadow: "0 2px 10px rgba(0,0,0,0.1)" }}>
+        <h3 style={{ borderBottom: "2px solid #e0e6ed", paddingBottom: "10px" }}>Select Business Unit</h3>
+        <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
+          <button 
+            onClick={() => setRegion('Global')} 
+            style={{ flex: 1, padding: "10px", background: region === 'Global' ? "#1a3a6c" : "#f0f4f8", color: region === 'Global' ? "#fff" : "#333", border: "1px solid #ccc", borderRadius: "4px", cursor: "pointer", fontWeight: "bold" }}
+          >
+            QNET (Global)
+          </button>
+          <button 
+            onClick={() => setRegion('Vihaan')} 
+            style={{ flex: 1, padding: "10px", background: region === 'Vihaan' ? "#1a3a6c" : "#f0f4f8", color: region === 'Vihaan' ? "#fff" : "#333", border: "1px solid #ccc", borderRadius: "4px", cursor: "pointer", fontWeight: "bold" }}
+          >
+            Vihaan (India)
+          </button>
+        </div>
+
         <h3 style={{ borderBottom: "2px solid #e0e6ed", paddingBottom: "10px" }}>Distributor Details</h3>
         <input name="name" placeholder="Distributor Name" onChange={handleChange} style={{ width: "100%", marginBottom: "10px", padding: "8px", borderRadius: "4px", border: "1px solid #ccc" }} />
         <input name="id" placeholder="Distributor ID" onChange={handleChange} style={{ width: "100%", marginBottom: "10px", padding: "8px", borderRadius: "4px", border: "1px solid #ccc" }} />
-        <textarea name="caseSummary" placeholder="Case Summary / Violation Description" onChange={handleChange} style={{ width: "100%", marginBottom: "10px", padding: "8px", height: "80px", borderRadius: "4px", border: "1px solid #ccc" }} />
-        
-        <h3 style={{ borderBottom: "2px solid #e0e6ed", paddingBottom: "10px", marginTop: "20px" }}>Training Content</h3>
-        <input name="section1Title" value={formData.section1Title} onChange={handleChange} style={{ width: "100%", marginBottom: "10px", padding: "8px", borderRadius: "4px", border: "1px solid #ccc" }} />
-        <textarea name="section1Text" value={formData.section1Text} onChange={handleChange} style={{ width: "100%", marginBottom: "10px", padding: "8px", height: "100px", borderRadius: "4px", border: "1px solid #ccc" }} />
-        <textarea name="redLines1" value={formData.redLines1} onChange={handleChange} placeholder="Red Lines (Press Enter after each line)" style={{ width: "100%", marginBottom: "10px", padding: "8px", height: "100px", borderRadius: "4px", border: "1px solid #ccc" }} />
+        <input name="recipientEmail" placeholder="Distributor Email (To)" onChange={handleChange} style={{ width: "100%", marginBottom: "20px", padding: "8px", borderRadius: "4px", border: "1px solid #ccc" }} />
 
         <h3 style={{ borderBottom: "2px solid #e0e6ed", paddingBottom: "10px" }}>Select 10 Questions ({selectedQuestions.length}/10 selected)</h3>
         <div style={{ maxHeight: "400px", overflowY: "auto", border: "1px solid #ccc", padding: "10px", marginBottom: "20px", borderRadius: "4px" }}>
@@ -361,14 +369,14 @@ export default function Home() {
                   disabled={!selectedQuestions.includes(q.id) && selectedQuestions.length >= 10}
                   style={{ marginRight: "10px", marginTop: "5px" }}
                 />
-                <span><strong>[{q.category}]</strong> {q.question_text}</span>
+                <span><strong>[{q.category}]</strong> {localize(q.question_text)}</span>
               </label>
             </div>
           ))}
         </div>
 
         <button onClick={generateHTML} style={{ background: "#27ae60", color: "white", padding: "15px 30px", border: "none", borderRadius: "5px", cursor: "pointer", fontSize: "16px", fontWeight: "bold" }}>
-          Generate & Download HTML Module
+          Generate, Download & Draft Email ({region})
         </button>
       </div>
     </div>
