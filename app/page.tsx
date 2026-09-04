@@ -61,7 +61,6 @@ export default function Home() {
     name: "",
     id: "",
     caseSummary: "",
-    policyRef: "",
     section1Title: "Section 1: Product Authorization & Explicit Prior Approval",
     section1Text: "When a prospect or downline provides funds for a specific QNET product, you are acting in a position of trust. You must purchase exactly the product they have chosen and requested.",
     redLines1: "Do NOT purchase products for an IR without explicit prior approval.\nDo NOT place an order or make unauthorized product collection on behalf of an IR."
@@ -149,7 +148,6 @@ export default function Home() {
   .red-lines-content ul li { padding: 6px 0 6px 28px; position: relative; border-bottom: 1px solid #f8d7da; font-size: 0.95em; }
   .red-lines-content ul li:last-child { border-bottom: none; }
   .red-lines-content ul li::before { content: "✗"; position: absolute; left: 4px; color: #c0392b; font-weight: bold; font-size: 1.1em; }
-  .policy-ref { background: #f0f4f8; border: 1px solid #d6dee8; padding: 10px 14px; border-radius: 5px; margin-top: 12px; font-size: 0.88em; color: #34495e; }
   .quiz-section { background: #fafbfc; padding: 25px; border-radius: 8px; border: 1px solid #e0e6ed; margin-top: 30px; }
   .quiz-section h2 { color: #1a3a6c; margin-bottom: 8px; }
   .quiz-instructions { font-size: 0.9em; color: #7f8c8d; margin-bottom: 20px; }
@@ -204,7 +202,6 @@ export default function Home() {
         <h4>Red Lines — What NOT to Do:</h4>
         <ul>${redLinesList}</ul>
       </div>
-      <div class="policy-ref"><strong>Policy Reference:</strong> ${formData.policyRef}</div>
     </div>
     <div class="quiz-section">
       <h2>Compliance Quiz</h2>
@@ -351,7 +348,6 @@ export default function Home() {
         <input name="section1Title" value={formData.section1Title} onChange={handleChange} style={{ width: "100%", marginBottom: "10px", padding: "8px", borderRadius: "4px", border: "1px solid #ccc" }} />
         <textarea name="section1Text" value={formData.section1Text} onChange={handleChange} style={{ width: "100%", marginBottom: "10px", padding: "8px", height: "100px", borderRadius: "4px", border: "1px solid #ccc" }} />
         <textarea name="redLines1" value={formData.redLines1} onChange={handleChange} placeholder="Red Lines (Press Enter after each line)" style={{ width: "100%", marginBottom: "10px", padding: "8px", height: "100px", borderRadius: "4px", border: "1px solid #ccc" }} />
-        <input name="policyRef" placeholder="Policy References (e.g., P&P 4.06)" onChange={handleChange} style={{ width: "100%", marginBottom: "20px", padding: "8px", borderRadius: "4px", border: "1px solid #ccc" }} />
 
         <h3 style={{ borderBottom: "2px solid #e0e6ed", paddingBottom: "10px" }}>Select 10 Questions ({selectedQuestions.length}/10 selected)</h3>
         <div style={{ maxHeight: "400px", overflowY: "auto", border: "1px solid #ccc", padding: "10px", marginBottom: "20px", borderRadius: "4px" }}>
